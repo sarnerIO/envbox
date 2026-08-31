@@ -13,8 +13,8 @@ type Config struct {
 }
 
 type EnvConfig struct {
-	EnvFile     string
-	ExampleFile string
+	EnvFile     string `toml:"env_file"`
+	ExampleFile string `toml:"example_file"`
 }
 
 type RequiredField struct {
@@ -22,7 +22,7 @@ type RequiredField struct {
 }
 
 type ScanConfig struct {
-	IgnorePaths []string
+	IgnorePaths []string `toml:"ignore_paths"`
 }
 
 func Load(path string) (*Config, error) {

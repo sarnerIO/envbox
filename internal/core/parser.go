@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"os"
 	"strings"
 )
 
 func Parse(content string) (*EnvFile, error) {
+	content = strings.TrimPrefix(content, "\xef\xbb\xbf")
 	f := &EnvFile{}
 	lines, err := splitLines(content)
 	if err != nil {
@@ -26,7 +28,22 @@ func Parse(content string) (*EnvFile, error) {
 	}
 
 	f.HadTrailingNewline = strings.HasSuffix(content, "\n")
+	if f.HadTrailingNewline && len(f.Lines) > 0 {
+		last := f.Lines[len(f.Lines)-1]
+		if last.Type == LineEmpty && last.Raw == "" {
+			f.Lines = f.Lines[:len(f.Lines)-1]
+		}
+	}
+
 	return f, nil
+}
+
+func ParseFile(path string) (*EnvFile, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return Parse(string(data))
 }
 
 func splitLines(content string) ([]string, error) {
