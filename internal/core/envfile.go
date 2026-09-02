@@ -1,5 +1,7 @@
 package core
 
+import "strings"
+
 type LineType int
 
 const (
@@ -7,6 +9,27 @@ const (
 	LineComment
 	LineEnvVar
 )
+
+var sensitivePatterns = []string{
+	"KEY",
+	"SECRET",
+	"TOKEN",
+	"PASSWORD",
+	"PASS",
+	"AUTH",
+	"PRIVATE",
+	"CREDENTIAL",
+}
+
+func IsSensitiveKey(key string) bool {
+	upper := strings.ToUpper(key)
+	for _, pattern := range sensitivePatterns {
+		if strings.Contains(upper, pattern) {
+			return true
+		}
+	}
+	return false
+}
 
 type EnvLine struct {
 	Type     LineType

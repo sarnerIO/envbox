@@ -3,7 +3,6 @@ package cli
 import (
 	"fmt"
 	"os"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
@@ -23,26 +22,6 @@ var listCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(listCmd)
 	listCmd.Flags().BoolVarP(&reveal, "reveal", "r", false, "Show sensitive values unmasked")
-}
-
-var sensitivePatterns = []string{
-	"KEY",
-	"SECRET",
-	"TOKEN",
-	"PASSWORD",
-	"PASS",
-	"AUTH",
-	"PRIVATE",
-}
-
-func isSensitive(key string) bool {
-	upper := strings.ToUpper(key)
-	for _, pattern := range sensitivePatterns {
-		if strings.Contains(upper, pattern) {
-			return true
-		}
-	}
-	return false
 }
 
 func mask(value string) string {
@@ -73,7 +52,7 @@ func runList(cmd *cobra.Command, args []string) error {
 			continue
 		}
 		value := line.Value
-		if !reveal && isSensitive(line.Key) {
+		if !reveal && core.IsSensitiveKey(line.Key) {
 			value = mask(value)
 		}
 		fmt.Fprintf(tw, "%s\t%s\n", line.Key, value)

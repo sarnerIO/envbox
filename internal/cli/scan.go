@@ -107,24 +107,13 @@ func extractEnvSecrets(f *core.EnvFile) map[string]string {
 	secrets := make(map[string]string)
 	for _, line := range f.Lines {
 		if line.Type == core.LineEnvVar && len(line.Value) > 6 {
-			if !isSensitiveKey(line.Key) {
+			if !core.IsSensitiveKey(line.Key) {
 				continue
 			}
 			secrets[line.Value] = line.Key
 		}
 	}
 	return secrets
-}
-
-func isSensitiveKey(key string) bool {
-	upper := strings.ToUpper(key)
-	sensitive := []string{"KEY", "SECRET", "TOKEN", "PASSWORD", "PASS", "AUTH", "PRIVATE", "CREDENTIAL"}
-	for _, s := range sensitive {
-		if strings.Contains(upper, s) {
-			return true
-		}
-	}
-	return false
 }
 
 func loadGitignore() error {
